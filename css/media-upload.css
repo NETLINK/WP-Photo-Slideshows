@@ -1,0 +1,12 @@
+/* CSS Document */
+
+li#tab-library,
+li#tab-type_url,
+tr.submit > td.savesend > input,
+#gallery-settings,
+#media-upload tr.url,
+#media-upload tr.align,
+#media-upload tr.image-size
+{
+	display: none !important;
+}
