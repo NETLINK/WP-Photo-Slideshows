@@ -28,6 +28,15 @@ jQuery( document ).ready( function($) {
 	$( container ).append( '<div class="slideshow-images-1"><div class="caption"></div></div>' );
 	$( container ).append( '<div class="slideshow-images-2"><div class="caption"></div></div>' );
 	
+	var images = new Array();
+	
+	for ( i = 0; i < photos.length; i++ ) {
+		images[i] = new Image();
+		images[i].src = photos[i]['src'];
+	}
+	
+	console.log( images );
+	
 
     var init_slick = function() {
 		$('.responsive').slick({
@@ -178,7 +187,6 @@ jQuery( document ).ready( function($) {
 		else {
 			currentImg = image;
 		}
-		console.log( photos.length );
 		
 		// Check which container we need to use
 		var currentContainer = activeContainer;
