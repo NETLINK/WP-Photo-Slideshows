@@ -166,27 +166,29 @@ jQuery( document ).ready( function($) {
 		// Check which current image we need to show
 		if ( image == "next" )
 		{
-			currentImg++;
-			if ( currentImg == photos.length )
-			{
+			if ( currentImg == photos.length - 1 ) {
 				currentImg = 0;
 			}
-		}
-		else if ( image == "previous" )
-		{
-			currentImg--;
-			
-			/*
-			if ( currentImg == 0 )
-			{
-				currentImg = photos.length;
+			else {
+				currentImg++;
 			}
-			*/
+		}
+		else if ( image == "back" )
+		{
+			
+			if ( currentImg <= 0 ) {
+				currentImg = photos.length - 1;
+			}
+			else {
+				currentImg--;
+			}
 		}
 		
 		else {
 			currentImg = image;
 		}
+		
+		console.log( currentImg );
 		
 		// Check which container we need to use
 		var currentContainer = activeContainer;
