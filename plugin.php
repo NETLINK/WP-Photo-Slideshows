@@ -1,22 +1,9 @@
 <?php
 
-/*
- * ====================================================
- * plugin.php
- * $Author: julianm $
- * $Revision: 132 $
- * $Date: 2014-11-30 09:36:40 +0000 (Sun, 30 Nov 2014) $
- * $HeadURL: https://bravo.netlink-dns.com/svn/wordpress/plugins/wp-photo-galleries/plugin.php $
- * ====================================================
- */
-
-class wp_photo_galleries
-{
-	private $load = true;
-	private $uploads;
-	private $width = 950;
-	private $height = 320;
+class WPPhotoSlideshows {
 	
+	private $load = true;
+	private $uploads;	
 	private $default;
 	
 	private $metaname = '_pg_gallery_settings';
@@ -25,17 +12,13 @@ class wp_photo_galleries
 		
 		$this->uploads = wp_upload_dir();
 		
-		//var_dump( $this->uploads );
-		
 		add_action( 'init', array( $this, 'init' ) );
-		add_action( 'wp_head', array( $this, 'head' ) );
-		add_action( 'admin_head', array( $this, 'admin_head' ) );
+		//add_action( 'wp_head', array( $this, 'head' ) );
 		add_action( 'do_meta_boxes', array( $this, 'meta_boxes' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue' ) );
 		add_action( 'manage_gallery_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
 		add_action( 'save_post', array( $this, 'save_gallery_meta' ), 1, 2 ); // Save the custom fields
-		add_action( 'wp_footer', array( $this, 'js_snippets' ) );
 		
 		add_filter( 'media_upload_tabs', array( $this, 'remove_media_tabs' ) );
 		add_filter( 'post_updated_messages', array( $this, 'messages' ) );
@@ -46,11 +29,10 @@ class wp_photo_galleries
 	}
 		
 	function init() {
-		// Register Custom Post Type
+		# Get default gallery
 		$this->default = get_page_by_title( 'Default', 'OBJECT', 'gallery' );
-		self::register_galleries_post_type();
-		// Add rewrite rules
-		//add_rewrite_rule( '^nutrition/([^/]*)/([^/]*)/?', 'index.php?p=12&food=$matches[1]&variety=$matches[2]', 'top' );
+		# Register Custom Post Type
+		$this->register_galleries_post_type();
 	}
 	
 	function head() {
@@ -70,24 +52,11 @@ class wp_photo_galleries
 		) );
 		wp_localize_script( 'swfobject', 'attributes', array() );
 	}
-	
-	function admin_head() {
-		/*
-		global $post_type;
-		*/
-		echo "<style type=\"text/css\">\n";
-		if ( $_GET['post_type'] == 'gallery' ) :
-		echo "#icon-edit { background:transparent url('" . plugins_url( 'images/icon-32.png', __FILE__ ) . "') no-repeat; }\n";		
-		endif;
-		echo "#adminmenu #menu-posts-gallery div.wp-menu-image{background:transparent url('" . plugins_url( 'images/icon-28.png', __FILE__ ) . "') no-repeat top center;}\n";
-		echo "#adminmenu #menu-posts-gallery:hover div.wp-menu-image,#adminmenu #menu-posts-gallery.wp-has-current-submenu div.wp-menu-image{background-position:bottom center;}\n";
-		echo "</style>\n";
-	}
 		
-	function register_galleries_post_type() {
+	private function register_galleries_post_type() {
 		
 		$labels = array(
-			'name' => __( 'Slideshow Galleries', 'post type general name' ),
+			'name' => __( 'Slideshows', 'post type general name' ),
 			'singular_name' => __( 'Gallery', 'post type singular name' ),
 			'add_new' => __( 'Add New', 'gallery' ),
 			'add_new_item' => __( "Add New Gallery" ),
@@ -115,7 +84,7 @@ class wp_photo_galleries
 			'capability_type' => 'page',
 			//'hierarchical' => false,
 			'menu_position' => NULL,
-			//'menu_icon' => plugins_url( 'images/icon-28.png', __FILE__ ),
+			'menu_icon' => 'dashicons-format-gallery',
 			'supports' => array( 'title' ),
 		);
 		
@@ -234,7 +203,7 @@ class wp_photo_galleries
 	
 		echo $html;
 	
-	} // end wp_custom_attachment
+	}
 	
 	function gallery_settings( $post ) {
 		
@@ -517,8 +486,7 @@ class wp_photo_galleries
 	{
 		$post_id = isset( $_REQUEST['post_id'] ) ? $_REQUEST['post_id'] : NULL;
 		
-		if ( !empty( $post_id ) && 'gallery' == get_post_type( $post_id ) )
-		{
+		if ( !empty( $post_id ) && 'gallery' == get_post_type( $post_id ) ) {
 			unset( $tabs['library'] );
 			unset( $tabs['type_url'] );
 		}
@@ -544,8 +512,8 @@ class wp_photo_galleries
 	  return $messages;
 	}
 	
-	function columns( $columns )
-	{
+	function columns( $columns ) {
+		
 		$new_columns['cb'] = '<input type="checkbox" />';
 		$new_columns['id'] = __( 'ID' );
 		$new_columns['title'] = _x( 'Gallery Name', 'column name' );
@@ -578,18 +546,15 @@ class wp_photo_galleries
 		}
 	}
 
-	function list_galleries()
-	{
+	function list_galleries() {
+		
 		global $post;
 		
 		$gallery = get_post_meta( $post->ID, $this->metaname . "_gallery_id", true );
 				
-		//$default = get_page_by_title( 'Default', 'OBJECT', 'gallery' );
 		$default = $this->default;
 		
 		$default_gallery_id = is_array( $default ) ? (string)$default->ID : NULL;
-		
-		//var_dump( get_post_types() );
 		
 		$args = array(
 			'post_type' => 'gallery',
@@ -605,8 +570,8 @@ class wp_photo_galleries
 		wp_create_nonce( '_gallery_settings_nonce' ), '" />', "\n";
 	}
 		
-	function get_cached_file_info( $id )
-	{
+	private function get_cached_file_info( $id ) {
+		
 		$files = array();
 		
 		$filename = "galleries/gallery-params-$id.js";
@@ -633,34 +598,22 @@ class wp_photo_galleries
 
 		return $files;
 	}
-	
-	// see wp_footer_scripts
-	function js_snippets()
-	{
-		if ( $this->load === false )
-			return;
 		
-		if ( wp_script_is( 'swfobject', 'done' ) ) :
-			$player = plugins_url( 'swf/player.swf', __FILE__ );
-			echo '<script type="text/javascript">jQuery("#slideshow").append(\'<div id="flash-slideshow"></div>\'); swfobject.embedSWF( "' . $player . '", "flash-slideshow", "100%", "100%", "10.0.0", false, flashvars, params, attributes );</script>';
-		endif;
-	}
-	
-	function slideshow_shortcode( $atts )
-	{
+	function slideshow_shortcode( $atts ) {
+		
 		extract( shortcode_atts( array(
 			'width' => $this->width,
 			'height' => $this->height,
 			'align' => NULL,
 		), $atts ) );
 		
-		$code = '<div id="slideshow" style="width: ' . $width . 'px; height: ' . $height . 'px; max-width: 100%; ' . ( ( $align === 'centre' ) ? 'margin: 5px auto;' : 'margin: 5px;' ) . '"></div>' . "\n";
+		$code = '<div id="slideshow"></div>' . "\n";
 		
 		return $code;
 	}
 	
-	function verify_post_type( $post = false )
-	{
+	function verify_post_type( $post = false ) {
+		
 		// check for post_type query arg (post new)
 		if ( $post == false && isset( $_GET['post_type'] ) && $_GET['post_type'] == 'gallery' )
 			return true;
@@ -685,6 +638,6 @@ class wp_photo_galleries
 	}
 }
 
-$wp_photo_galleries = new wp_photo_galleries;
+new WPPhotoSlideshows;
 
 ?>
