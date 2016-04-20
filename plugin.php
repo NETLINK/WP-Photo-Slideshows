@@ -19,6 +19,7 @@ class WPPhotoSlideshows {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue' ) );
 		add_action( 'manage_gallery_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
 		add_action( 'save_post', array( $this, 'save_gallery_meta' ), 1, 2 ); // Save the custom fields
+		add_action( 'before_delete_post', array( $this, 'delete_associated_media' ) );
 		
 		add_filter( 'media_upload_tabs', array( $this, 'remove_media_tabs' ) );
 		add_filter( 'post_updated_messages', array( $this, 'messages' ) );
@@ -452,8 +453,7 @@ class WPPhotoSlideshows {
 		}
 	}
 
-	function save_meta( $post )
-	{
+	function save_meta( $post ) {
 		
 		// DONT FORGET PREFIX !!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -482,8 +482,8 @@ class WPPhotoSlideshows {
 		}
 	}
 
-	function remove_media_tabs( $tabs )
-	{
+	function remove_media_tabs( $tabs ) {
+		
 		$post_id = isset( $_REQUEST['post_id'] ) ? $_REQUEST['post_id'] : NULL;
 		
 		if ( !empty( $post_id ) && 'gallery' == get_post_type( $post_id ) ) {
@@ -494,8 +494,8 @@ class WPPhotoSlideshows {
 		return $tabs;
 	}
 	
-	function messages( $messages )
-	{
+	function messages( $messages ) {
+		
 		$messages['gallery'] = array(
 			0 => '', // Unused. Messages start at index 1.
 			1 => __( 'Gallery updated.' ),
@@ -524,8 +524,8 @@ class WPPhotoSlideshows {
 		return $new_columns;
 	}
 	
-	function column_content( $column, $id )
-	{
+	function column_content( $column, $id ) {
+		
 		global $wpdb;
 		
 		switch ( $column )
@@ -635,6 +635,34 @@ class WPPhotoSlideshows {
 			
 		return $post_type == 'gallery';
 
+	}
+	
+	function delete_associated_media( $id ) {
+		
+		# Check if gallery
+		if ( 'gallery' !== get_post_type( $id ) ) {
+			return;
+		}
+		
+		$media = get_children( array(
+			'post_parent' => $id,
+			'post_type' => 'attachment'
+		) );
+		
+		if ( empty( $media ) ) {
+			return;
+		}
+		
+		foreach ( $media as $file ) {
+			// pick what you want to do
+			wp_delete_attachment( $file->ID );
+		}
+		
+		$js_file = $this->uploads['basedir'] . "/galleries/gallery-{$id}.js";
+		
+		if ( file_exists( $js_file ) ) {
+			unlink( $js_file );
+		}
 	}
 }
 
