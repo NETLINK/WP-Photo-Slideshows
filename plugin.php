@@ -21,8 +21,7 @@ class wp_photo_galleries
 	
 	private $metaname = '_pg_gallery_settings';
 	
-	function __construct()
-	{
+	function __construct() {
 		
 		$this->uploads = wp_upload_dir();
 		
@@ -46,8 +45,7 @@ class wp_photo_galleries
 		
 	}
 		
-	function init()
-	{
+	function init() {
 		// Register Custom Post Type
 		$this->default = get_page_by_title( 'Default', 'OBJECT', 'gallery' );
 		self::register_galleries_post_type();
@@ -55,8 +53,8 @@ class wp_photo_galleries
 		//add_rewrite_rule( '^nutrition/([^/]*)/([^/]*)/?', 'index.php?p=12&food=$matches[1]&variety=$matches[2]', 'top' );
 	}
 	
-	function head()
-	{
+	function head() {
+		
 		global $post;
 		$id = $post->ID;
 		$array = array(
@@ -73,8 +71,7 @@ class wp_photo_galleries
 		wp_localize_script( 'swfobject', 'attributes', array() );
 	}
 	
-	function admin_head()
-	{
+	function admin_head() {
 		/*
 		global $post_type;
 		*/
@@ -87,8 +84,8 @@ class wp_photo_galleries
 		echo "</style>\n";
 	}
 		
-	function register_galleries_post_type()
-	{
+	function register_galleries_post_type() {
+		
 		$labels = array(
 			'name' => __( 'Slideshow Galleries', 'post type general name' ),
 			'singular_name' => __( 'Gallery', 'post type singular name' ),
@@ -121,11 +118,12 @@ class wp_photo_galleries
 			//'menu_icon' => plugins_url( 'images/icon-28.png', __FILE__ ),
 			'supports' => array( 'title' ),
 		);
+		
 		register_post_type( 'gallery', $args );
 	}
 	
-	function enqueue()
-	{
+	function enqueue() {
+		
 		global $post;
 		$pid = $post->ID;
 		//$meta = get_post_custom( $post->ID );
@@ -142,29 +140,27 @@ class wp_photo_galleries
 		}
 		
 		$player = get_post_meta( $gid, $this->metaname . '_player', true );
-				
-		if ( $player === 'Flash' )
-		{
-			wp_enqueue_script( 'swfobject' );
-			wp_enqueue_script( 'gallery-slideshow', $this->uploads['baseurl'] . "/galleries/gallery-$gid.js", array( 'swfobject', 'jquery' ) );
-			//wp_enqueue_script( 'gallery-slideshow' );
-		}
-		else
-		{
-			wp_register_script( 'slick', plugins_url( '/libraries/slick/slick/slick.min.js', __FILE__ ), array( 'jquery' ) );
-			wp_register_script( 'javascript-slideshow', plugins_url( '/js/slideshow.js?v=2', __FILE__ ), array( 'jquery', 'gallery-slideshow', 'slick' ) );
-			wp_enqueue_script( 'gallery-slideshow', $this->uploads['baseurl'] . "/galleries/gallery-$gid.js", array( 'jquery' ) );
-			wp_enqueue_script( 'slick' );
-			wp_enqueue_script( 'javascript-slideshow' );
-			
-			wp_enqueue_style( 'slick', plugins_url( '/libraries/slick/slick/slick.css', __FILE__ ) );
-			wp_enqueue_style( 'slick-theme', plugins_url( '/libraries/slick/slick/slick-theme.css', __FILE__ ) );
-		}
+		
+		//wp_register_script( 'slick', plugins_url( '/libraries/slick/slick/slick.min.js', __FILE__ ), array( 'jquery' ) );
+		
+		$mtime = filemtime( __DIR__ . "/js/slideshow.js" );
+		wp_register_script( 'javascript-slideshow', plugins_url( '/js/slideshow.js?v={$mtime}', __FILE__ ), array( 'jquery', 'gallery-slideshow', 'vegas' ) );
+		
+		wp_register_script( 'vegas', plugins_url( '/js/vegas.min.js?v=2.2.0', __FILE__ ), array( 'jquery', 'gallery-slideshow' ) );
+		
+		$mtime = filemtime( $this->uploads['basedir'] . "/galleries/gallery-{$gid}.js" );
+		wp_register_script( 'gallery-slideshow', $this->uploads['baseurl'] . "/galleries/gallery-{$gid}.js?v={$mtime}", array( 'jquery' ) );
+		
+		//wp_enqueue_script( 'slick' );
+		wp_enqueue_script( 'javascript-slideshow' );
+		
+		wp_enqueue_style( 'vegas', plugins_url( '/css/vegas.min.css', __FILE__ ) );
+		//wp_enqueue_style( 'slick-theme', plugins_url( '/libraries/slick/slick/slick-theme.css', __FILE__ ) );
 
 	}
 
-	function admin_enqueue()
-	{
+	function admin_enqueue() {
+		
 		$is_gallery = $this->verify_post_type();
 		
 		//if ( isset( $_GET['gallery-settings'] ) && $_GET['gallery-settings'] == 'false' )
@@ -176,31 +172,27 @@ class wp_photo_galleries
 		//if ( 'gallery' == $post_type )
 		//if ( $is_gallery )
 		//{
-			wp_register_script( 'gallery-settings', plugins_url( '/js/scripts.js', __FILE__ ) );
-			wp_enqueue_script( 'gallery-settings' );
+			//wp_register_script( 'gallery-settings', plugins_url( '/js/scripts.js', __FILE__ ) );
+			//wp_enqueue_script( 'gallery-settings' );
 			wp_enqueue_script( 'media-upload' );
 			add_thickbox();
 		}
 	}
 	
-	function get_cached_files( $id )
-	{
+	function get_cached_files( $id ) {
+		
 		$files = self::get_cached_file_info( $id );
-		if ( is_array( $files ) )
-		{
-			if ( $files['js']['time'] < ( time() + $this->cache_time ) )
-			{
+		if ( is_array( $files ) ) {
+			if ( $files['js']['time'] < ( time() + $this->cache_time ) ) {
 				
 			}
 		}
-		if ( $files !== false && ( $files['js'] ) )
-		{
+		if ( $files !== false && ( $files['js'] ) ) {
 			
 		}
 	}
 	
-	function meta_boxes()
-	{
+	function meta_boxes() {
 		// Image management
 		add_meta_box(
 			'wp_custom_attachment',
@@ -228,8 +220,8 @@ class wp_photo_galleries
 		);	// Define the custom attachment for pages
 	}
 
-	function gallery_attachments( $post )
-	{
+	function gallery_attachments( $post ) {
+		
 		wp_nonce_field( plugin_basename( __FILE__ ), 'wp_custom_attachment_nonce' );
 	
 		$html = '<div class="description">';
@@ -244,9 +236,10 @@ class wp_photo_galleries
 	
 	} // end wp_custom_attachment
 	
-	function gallery_settings( $post )
-	{
+	function gallery_settings( $post ) {
+		
 		$fields = array(
+			/*
 			array(
 				'label' => 'Slideshow player',
 				'desc' => 'select JavaScript or Flash player',
@@ -254,6 +247,7 @@ class wp_photo_galleries
 				'type' => 'select',
 				'options' => array( 'JavaScript', 'Flash' ),
 			),
+			*/
 			array(
 				'label' => 'Container',
 				'desc' => 'can be a class or id (e.g. .slideshow or #slideshow)',
@@ -271,13 +265,14 @@ class wp_photo_galleries
 				'default' => 6000,
 			),
 			array(
-				'label' => 'Transition',
+				'label' => 'Transition Duration',
 				'desc' => 'in milliseconds',
-				'key' => 'transition',
+				'key' => 'transitionDuration',
 				'type' => 'text',
 				'class' => '_pg_javascript_settings',
 				'default' => 1000,
 			),
+			/*
 			array(
 				'label' => 'x-Position',
 				'desc' => '',
@@ -294,12 +289,13 @@ class wp_photo_galleries
 				'class' => '_pg_javascript_settings',
 				'options' => array( 'center', 'top', 'bottom' ),
 			),
+			*/
 			array(
 				'label' => 'Pan / Zoom',
 				'desc' => 'choose to enable or disable pan/zoom effect',
 				'key' => 'panZoom',
 				'type' => 'select',
-				'class' => '_pg_flash_settings',
+				'class' => '_pg_javascript_settings',
 				'options' => array( 'On', 'Off' ),
 			),
 			array(
@@ -323,7 +319,7 @@ class wp_photo_galleries
 				'desc' => 'the order in which the images will be rotated',
 				'key' => 'orderby',
 				'type' => 'select',
-				'class' => '_pg_javascript_flash_settings',
+				'class' => '_pg_javascript_settings',
 				'options' => array( 'custom defined', 'title', 'random' ),
 			),
 			/*
@@ -392,10 +388,12 @@ class wp_photo_galleries
 			
 			$attachments = get_posts( $args );
 			
+			/*
 			$content = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
 				. "<gallery>\n"
 				. "\t<album>\n"
 			;
+			*/
 			
 			$imgArray = array();
 			$i = 0;
@@ -404,46 +402,62 @@ class wp_photo_galleries
 				$image = wp_get_attachment_image_src( $attachment->ID, array( $this->width, $this->height ) );
 				$thumb = wp_get_attachment_image_src( $attachment->ID, 'thumbnail' );
 				$imgArray[$i]['src'] = $image[0];
-				$imgArray[$i]['thumb'] = $thumb[0];
-				$imgArray[$i]['caption'] = $attachment->post_excerpt;
+				//$imgArray[] = $image[0];
+				//$imgArray[$i]['thumb'] = $thumb[0];
+				//$imgArray[$i]['caption'] = $attachment->post_excerpt;
 				$content .= "\t\t" . '<img src="' . $img[0] . '" />' . "\n";
 				$i++;
 			endforeach;
 			
+			/*
 			$content .= "\t</album>\n"
 				. "</gallery>\n"
 			;
+			*/
 			
 			//if ( is_writable( __DIR__ . '/xml/' ) ) :
 				//$file = __DIR__ . "/xml/gallery-images-$post_id.xml";
 			//else :
 				$basedir = $this->uploads['basedir'];
-				if ( !is_dir( "$basedir/galleries" ) )
+				
+				if ( !is_dir( "$basedir/galleries" ) ) {
 					mkdir( "$basedir/galleries", 0755 );
-				$file = $basedir . "/galleries/gallery-images-$post_id.xml";
+				}
+				
+				//$file = $basedir . "/galleries/gallery-images-$post_id.xml";
+				
 			//endif;
 			
-			$result = file_put_contents( $file, $content, LOCK_EX );
+			//$result = file_put_contents( $file, $content, LOCK_EX );
 			
-			$xmlfile = $this->uploads['baseurl'] . "/galleries/gallery-images-$post_id.xml";
+			//$xmlfile = $this->uploads['baseurl'] . "/galleries/gallery-images-$post_id.xml";
 			
 			//$basedir = $this->uploads['basedir'];
 			//if ( !is_dir( "$basedir/js" ) )
 				//$result  = mkdir( "$basedir/js", 0755 );
 				//die( var_export( $result, true ) );
+			
 			$file = $basedir . "/galleries/gallery-$post_id.js";
+			
+			$panzoom = ( get_post_meta( $post_id, $this->metaname . '_panZoom', true ) === 'On' ) ? 'random' : '';
+			//$panzoom = get_post_meta( $post_id, $this->metaname . '_panZoom', true );
+			//die( var_export( $panzoom, true )) ;
+			
 			
 			$jsvars = array(
 				'container' => get_post_meta( $post_id, $this->metaname . '_container' ),
 				'transition' => get_post_meta( $post_id, $this->metaname . '_transition' ),
+				'transitionDuration' => get_post_meta( $post_id, $this->metaname . '_transitionDuration' ),
 				'interval' => get_post_meta( $post_id, $this->metaname . '_interval' ),
-				'x-position' => get_post_meta( $post_id, $this->metaname . '_x-position' ),
-				'y-position' => get_post_meta( $post_id, $this->metaname . '_y-position' ),
+				//'x-position' => get_post_meta( $post_id, $this->metaname . '_x-position' ),
+				//'y-position' => get_post_meta( $post_id, $this->metaname . '_y-position' ),
 				'controls' => get_post_meta( $post_id, $this->metaname . '_controls' ),
 				'thumbnails' => get_post_meta( $post_id, $this->metaname . '_thumbnails' ),
+				'animation' => $panzoom,
 				'image_url' => plugins_url( 'images/', __FILE__ ),
 			);
 			
+			/*
 			$flashvars = array(
 				'loadParams' => "false",
 				'xmlFilePath' => $xmlfile,
@@ -454,12 +468,14 @@ class wp_photo_galleries
 			);
 			
 			$params = array( 'wmode' => "transparent" );
+			*/
+			
 			$attributes = array();
 			
 			$content = "var imgArr = " . json_encode( $imgArray ) . ";\n";
 			$content .= "var jsvars = " . json_encode( $jsvars ) . ";\n";
-			$content .= "var flashvars = " . json_encode( $flashvars ) . ";\n";
-			$content .= "var params = " . json_encode( $params ) . ";\n";
+			//$content .= "var flashvars = " . json_encode( $flashvars ) . ";\n";
+			//$content .= "var params = " . json_encode( $params ) . ";\n";
 			$content .= "var attributes = " . json_encode( $attributes ) . ";\n";
 			
 			file_put_contents( $file, $content, LOCK_EX );

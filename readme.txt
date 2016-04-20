@@ -1,6 +1,6 @@
 === Photo Galleries ===
 Requires at least: 3.4
-Tested up to: 3.5.1
+Tested up to: 4.5
 License: All rights reserved
 
 Add and manage photo slideshows.
