@@ -146,7 +146,7 @@ class wp_photo_galleries
 		$mtime = filemtime( __DIR__ . "/js/slideshow.js" );
 		wp_register_script( 'javascript-slideshow', plugins_url( '/js/slideshow.js?v={$mtime}', __FILE__ ), array( 'jquery', 'gallery-slideshow', 'vegas' ) );
 		
-		wp_register_script( 'vegas', plugins_url( '/js/vegas.min.js?v=2.2.0', __FILE__ ), array( 'jquery', 'gallery-slideshow' ) );
+		wp_register_script( 'vegas', plugins_url( '/lib/vegas/vegas.min.js?v=2.2.0', __FILE__ ), array( 'jquery', 'gallery-slideshow' ) );
 		
 		$mtime = filemtime( $this->uploads['basedir'] . "/galleries/gallery-{$gid}.js" );
 		wp_register_script( 'gallery-slideshow', $this->uploads['baseurl'] . "/galleries/gallery-{$gid}.js?v={$mtime}", array( 'jquery' ) );
@@ -154,7 +154,7 @@ class wp_photo_galleries
 		//wp_enqueue_script( 'slick' );
 		wp_enqueue_script( 'javascript-slideshow' );
 		
-		wp_enqueue_style( 'vegas', plugins_url( '/css/vegas.min.css', __FILE__ ) );
+		wp_enqueue_style( 'vegas', plugins_url( '/lib/vegas/vegas.min.css', __FILE__ ) );
 		//wp_enqueue_style( 'slick-theme', plugins_url( '/libraries/slick/slick/slick-theme.css', __FILE__ ) );
 
 	}
