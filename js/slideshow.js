@@ -23,7 +23,13 @@ jQuery( document ).ready( function($) {
 		delay: jsvars['interval'],
 		transition: 'blur',
 		animation: jsvars['animation'],
-		transitionDuration: jsvars['transitionDuration']
+		transitionDuration: jsvars['transitionDuration'],
+		init: function( globalSettings ) {
+			console.log( "Init" );
+		},
+		walk: function( index, slideSettings ) {
+			console.log( "Slide index " + index + " image " + slideSettings.src );
+		}
 	});
-
+	
 });

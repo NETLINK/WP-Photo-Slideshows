@@ -6,6 +6,10 @@ class WPPhotoSlideshows {
 	private $uploads;	
 	private $default;
 	
+	// Default image size
+	var $width = 1024;
+	var $height = 768;
+	
 	private $metaname = '_pg_gallery_settings';
 	
 	function __construct() {
@@ -114,12 +118,12 @@ class WPPhotoSlideshows {
 		//wp_register_script( 'slick', plugins_url( '/libraries/slick/slick/slick.min.js', __FILE__ ), array( 'jquery' ) );
 		
 		$mtime = filemtime( __DIR__ . "/js/slideshow.js" );
-		wp_register_script( 'javascript-slideshow', plugins_url( '/js/slideshow.js?v={$mtime}', __FILE__ ), array( 'jquery', 'gallery-slideshow', 'vegas' ) );
+		wp_register_script( 'javascript-slideshow', plugins_url( "/js/slideshow.js", __FILE__ ), array( 'jquery', 'gallery-slideshow', 'vegas' ), $mtime, true );
 		
-		wp_register_script( 'vegas', plugins_url( '/lib/vegas/vegas.min.js?v=2.2.0', __FILE__ ), array( 'jquery', 'gallery-slideshow' ) );
+		wp_register_script( 'vegas', plugins_url( '/lib/vegas/vegas.min.js', __FILE__ ), array( 'jquery', 'gallery-slideshow' ), '2.2.0', true );
 		
 		$mtime = filemtime( $this->uploads['basedir'] . "/galleries/gallery-{$gid}.js" );
-		wp_register_script( 'gallery-slideshow', $this->uploads['baseurl'] . "/galleries/gallery-{$gid}.js?v={$mtime}", array( 'jquery' ) );
+		wp_register_script( 'gallery-slideshow', $this->uploads['baseurl'] . "/galleries/gallery-{$gid}.js?ver={$mtime}", array( 'jquery' ), $mtime, true );
 		
 		//wp_enqueue_script( 'slick' );
 		wp_enqueue_script( 'javascript-slideshow' );
