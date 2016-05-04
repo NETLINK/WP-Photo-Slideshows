@@ -4,7 +4,7 @@ Plugin Name: Photo Slideshows
 Plugin URI: http://www.netlink.ie/
 Description: WP Photo Slideshows - Upload and activate.
 Author: NETLINK IT SERVICES
-Version: 1.7
+Version: 1.8
 Author URI: http://www.netlink.ie/
 */
 

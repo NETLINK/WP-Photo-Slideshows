@@ -19,6 +19,9 @@ No screenshots available.
 
 == Changelog ==
 
+= Version 1.8 =
+* Updated gallery post type args.
+
 = Version 1.5 =
 * Fixed CSS background positioning.
 
