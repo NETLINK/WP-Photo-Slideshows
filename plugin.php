@@ -78,7 +78,7 @@ class WPPhotoSlideshows {
 			'public' => false,
 			'slug' => false,
 			'has_archive' => false,
-			'hierarchical' => false,
+			'hierarchical' => true,
 			'exclude_from_search' => true,
 			'show_in_menu' => true,
 			'show_ui' => true,
@@ -554,7 +554,7 @@ class WPPhotoSlideshows {
 		global $post;
 		
 		$gallery = get_post_meta( $post->ID, $this->metaname . "_gallery_id", true );
-				
+		
 		$default = $this->default;
 		
 		$default_gallery_id = is_array( $default ) ? (string)$default->ID : NULL;
