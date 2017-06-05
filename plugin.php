@@ -104,6 +104,10 @@ class WPPhotoSlideshows {
 		
 		// Use default gallery
 		if ( empty( $gid ) )
+			if ( !is_object( $this->default ) ) {
+				$this->load = false;
+				return;
+			}
 			$gid = $this->default->ID;
 		
 		if ( empty( $gid ) )
@@ -377,7 +381,7 @@ class WPPhotoSlideshows {
 				$imgArray[$i]['src'] = $image[0];
 				//$imgArray[] = $image[0];
 				//$imgArray[$i]['thumb'] = $thumb[0];
-				//$imgArray[$i]['caption'] = $attachment->post_excerpt;
+				$imgArray[$i]['caption'] = $attachment->post_excerpt;
 				$content .= "\t\t" . '<img src="' . $img[0] . '" />' . "\n";
 				$i++;
 			endforeach;
