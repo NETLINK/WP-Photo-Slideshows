@@ -466,7 +466,9 @@ class WPPhotoSlideshows {
 
 		// OK, we're authenticated: we need to find and save the data
 		// We'll put it into an array to make it easier to loop though.
-		$meta = $_POST[ $this->metaname ];
+		$meta = !empty( $_POST[ $this->metaname ] ) ? $_POST[ $this->metaname ] : false;
+		if ( !$meta ) return;
+		
 		// Add values of $events_meta as custom fields
 		foreach ( $meta as $key => $value )
 		{
@@ -474,14 +476,14 @@ class WPPhotoSlideshows {
 			
 			// Cycle through the meta array!
 			if ( $post->post_type == 'revision' ) return; // Don't store custom data twice
+			
 			$value = implode( ',', (array)$value ); // If $value is an array, make it a CSV (unlikely)
-			if ( get_post_meta( $post->ID, $key, FALSE ) )
-			{
+			
+			if ( get_post_meta( $post->ID, $key, FALSE ) ) {
 				// If the custom field already has a value
 				update_post_meta( $post->ID, $key, $value );
 			}
-			else
-			{
+			else {
 				// If the custom field doesn't have a value
 				add_post_meta( $post->ID, $key, $value );
 			}
