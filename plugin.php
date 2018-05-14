@@ -98,9 +98,11 @@ class WPPhotoSlideshows {
 	function enqueue() {
 		
 		global $post;
-		$pid = $post->ID;
-		//$meta = get_post_custom( $post->ID );
-		$gid = get_post_meta( $pid, $this->metaname . '_gallery_id', true );
+		$pid = !empty( $post->ID ) ? $post->ID : false;
+		
+		if ( !pid ) {
+			$gid = get_post_meta( $pid, $this->metaname . '_gallery_id', true );
+		}
 		
 		// Use default gallery
 		if ( empty( $gid ) )
