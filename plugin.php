@@ -100,7 +100,7 @@ class WPPhotoSlideshows {
 		global $post;
 		$pid = !empty( $post->ID ) ? $post->ID : false;
 		
-		if ( !pid ) {
+		if ( !$pid ) {
 			$gid = get_post_meta( $pid, $this->metaname . '_gallery_id', true );
 		}
 		
